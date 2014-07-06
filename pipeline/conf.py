@@ -16,6 +16,7 @@ DEFAULTS = {
     'PIPELINE_CSS_COMPRESSOR': 'pipeline.compressors.yuglify.YuglifyCompressor',
     'PIPELINE_JS_COMPRESSOR': 'pipeline.compressors.yuglify.YuglifyCompressor',
     'PIPELINE_COMPILERS': [],
+    'PIPELINE_DISABLED_COMPILERS': [],
 
     'PIPELINE_CSS': {},
     'PIPELINE_JS': {},

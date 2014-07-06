@@ -26,21 +26,27 @@ class Compiler(object):
     def compilers(self):
         return [to_class(compiler) for compiler in settings.PIPELINE_COMPILERS]
 
+    @property
+    def disabled_compilers(self):
+        return [to_class(compiler) for compiler in settings.PIPELINE_DISABLED_COMPILERS]
+
     def compile(self, paths, force=False):
         def _compile(input_path):
+            disabled_compilers = self.disabled_compilers
             for compiler in self.compilers:
                 compiler = compiler(verbose=self.verbose, storage=self.storage)
                 if compiler.match_file(input_path):
                     output_path = self.output_path(input_path, compiler.output_extension)
                     infile = finders.find(input_path)
                     outfile = self.output_path(infile, compiler.output_extension)
-                    outdated = compiler.is_outdated(input_path, output_path)
-                    try:
-                        compiler.compile_file(quote(infile), quote(outfile),
-                            outdated=outdated, force=force)
-                    except CompilerError:
-                        if not self.storage.exists(output_path) or settings.DEBUG:
-                            raise
+                    if compiler.__class__ not in disabled_compilers:
+                        outdated = compiler.is_outdated(input_path, output_path)
+                        try:
+                            compiler.compile_file(quote(infile), quote(outfile),
+                                outdated=outdated, force=force)
+                        except CompilerError:
+                            if not self.storage.exists(output_path) or settings.DEBUG:
+                                raise
                     return output_path
             else:
                 return input_path
