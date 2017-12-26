@@ -32,10 +32,7 @@ class Compiler(object):
             for compiler in self.compilers:
                 compiler = compiler(verbose=self.verbose, storage=self.storage)
                 if compiler.match_file(input_path):
-                    try:
-                        infile = self.storage.path(input_path)
-                    except NotImplementedError:
-                        infile = finders.find(input_path)
+                    infile = finders.find(input_path)
                     outfile = compiler.output_path(infile, compiler.output_extension)
                     outdated = compiler.is_outdated(infile, outfile)
                     compiler.compile_file(infile, outfile,
