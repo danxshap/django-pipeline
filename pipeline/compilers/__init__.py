@@ -10,6 +10,7 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.files.base import ContentFile
 from django.utils.encoding import smart_bytes
 from django.utils.six import string_types, text_type
+from django.conf import settings as django_settings
 
 from pipeline.conf import settings
 from pipeline.exceptions import CompilerError
@@ -32,9 +33,9 @@ class Compiler(object):
             for compiler in self.compilers:
                 compiler = compiler(verbose=self.verbose, storage=self.storage)
                 if compiler.match_file(input_path):
-                    try:
+                    if not django_settings.DEBUG:
                         infile = self.storage.path(input_path)
-                    except NotImplementedError:
+                    else:
                         infile = finders.find(input_path)
                     outfile = compiler.output_path(infile, compiler.output_extension)
                     outdated = compiler.is_outdated(infile, outfile)
